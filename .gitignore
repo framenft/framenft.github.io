@@ -1,0 +1,7 @@
+
+node_modules
+packages/hardhat/node_modules/
+packages/react-app/node_modules
+packages/subgraph/node_modules
+packages/hardhat/mnemonic.txt
+packages/hardhat/0xfb4d96707b0a65f39b90927bef466cd36bff7a61.txt
