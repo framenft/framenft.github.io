@@ -410,7 +410,7 @@ function App(props) {
               <div style={{top:"17%", position: "absolute", width: "100%", fontSize: "xxx-large", fontFamily: "monospace"}}>
 
               <h1>FRAMES</h1>
-              <p style={{fontSize: "small", width: "48%", left: "26%", position: "relative"}}>A iterative are piece to express yourself. Frame allows you to put whatever image you want into it. this way you can set your Twitter nft pfp once and then update it onchain as your tastes and interests evolve.</p>
+              <p style={{fontSize: "small", width: "48%", left: "26%", position: "relative"}}>An iterative art piece to express yourself. Frame allows you to put whatever image you want into it. This way you can set your Twitter nft pfp once and then update it onchain as your tastes and interests evolve.</p>
               
               <br/>
               </div>
