@@ -20,3 +20,13 @@ export function standardizeLink (link) {
     const urlParams = new URLSearchParams(queryString);
     return urlParams.get(param);
   }
+
+
+  export function getHashURLParam(param) {
+      if (window.location.toString().includes(param)) {
+        return window.location.toString().split(param+"=")[1];
+        /*  wont work if its not the last param*/
+      } else {
+        return null;
+      }
+  }

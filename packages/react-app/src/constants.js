@@ -28,7 +28,6 @@ export const NETWORKS = {
     chainId: 42,
     rpcUrl: `https://kovan.infura.io/v3/${INFURA_ID}`,
     blockExplorer: "https://kovan.etherscan.io/",
-    faucet: "https://gitter.im/kovan-testnet/faucet", // https://faucet.kovan.network/
   },
   rinkeby: {
     name: "rinkeby",
@@ -68,9 +67,10 @@ export const NETWORKS = {
     name: "matic",
     color: "#2bbdf7",
     chainId: 137,
-    price: 1,
-    gasPrice: 1000000000,
-    rpcUrl: "https://rpc-mainnet.maticvigil.com",
+    gas: 2100000000,
+    gasPrice: 8000000000000,
+    price: 210000000000,
+    rpcUrl: "https://polygon-rpc.com/",
     faucet: "https://faucet.matic.network/",
     blockExplorer: "https://explorer-mainnet.maticvigil.com//",
   },
@@ -142,6 +142,8 @@ export const NETWORKS = {
     chainId: 10,
     blockExplorer: "https://optimistic.etherscan.io/",
     rpcUrl: `https://mainnet.optimism.io`,
+    gas: 2100000000,
+    gasPrice: 8000000000000,
   },
   localAvalanche: {
     name: "localAvalanche",

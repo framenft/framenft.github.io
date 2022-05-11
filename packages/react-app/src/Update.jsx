@@ -20,7 +20,7 @@ import { create as createIPFSClient } from 'ipfs-http-client';
 const ipfsClient = createIPFSClient('https://ipfs.infura.io:5001')
 import { Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch } from "./components";
 import FramesAbi from "./contracts/Frames.abi";
-import { getURLParam } from "./helpers";
+import { getHashURLParam, getURLParam } from "./helpers";
 import ContractAddress from "./contracts/Frames.address";
 import { Loading3QuartersOutlined, LoadingOutlined } from "@ant-design/icons";
 
@@ -52,6 +52,7 @@ function Update(props) {
     const [description, setDescription] = useState();
     const [iterations, setIterations] = useState([]);
     const [newImageSet, setNewImageSet] = useState(false);
+    const [historyHunting, setHistoryHunting] = useState(false);
 
     const contractInstance = useExternalContractLoader(provider, ContractAddress, FramesAbi);
 
@@ -68,26 +69,27 @@ function Update(props) {
 
     async function setup() {
         if (!newImageSet) {
-            const d = await getData(tokenURI);
-            setBaseFile(d.image);
-            setDescription(d.description);
+            await getData(tokenURI, d => {
+                setBaseFile(d.image);
+                setDescription(d.description);
+            });
         }
     }
 
     console.log(`iterations is ${iterations}`);
-    console.log(iterations)
-    console.log(history)
-
+    console.log(iterations);
+    console.log(history);
 
     React.useEffect(() => {
-        let urlId = getURLParam("id");
+        let urlId = getHashURLParam("id") 
+        console.log(`got url id ${urlId}`);
         if (urlId & !id) {
             setId(urlId);
             setDescription(DESCRIPTION_PLACEHOLDER)
 
         }
 
-        if (history && iterations.length != history.length) {
+        if (history && !historyHunting) {
             gatherHistory(history);
         }
 
@@ -95,20 +97,25 @@ function Update(props) {
     }, [userSigner, id, history]);
 
     async function gatherHistory(history) {
+        console.log(`getting history`);
+        setHistoryHunting(true);
         for (var i = 0; i < history.length; i++) {
-            const d = await getData(history[i]);
-            setIterations([d].concat(iterations));
+            await getData(history[i], d=> {
+                console.log(`adding ${d.timestamp} to iterations`);
+                iterations.unshift(d)
+                setIterations(iterations);
+            });
         }
     }
 
-    async function getData(tokenURI) {
+    async function getData(tokenURI, callback) {
         const res = await fetch(tokenURI);
         const data = await res.json();
         console.log(data);
-        console.log("^tokendata");
+        console.log(`^history data ${data.timestamp}`);
         const image = await getImage(data.image);
         data.image = image;
-        return data;
+        callback(data);
 
     }
 
@@ -123,7 +130,6 @@ function Update(props) {
         reader.readAsDataURL(file);
         reader.onload = function () {
             console.log(reader.result);
-            setBaseFile(reader.result);
             formatFrame(reader.result);
         };
         reader.onerror = function (error) {
@@ -147,10 +153,13 @@ function Update(props) {
             context.drawImage(img1, 0, 0, img1.width, img1.height, canvas.width / 10, canvas.height / 20 * 3, canvas.width * 0.73, canvas.height * 0.76);
             //  context.globalAlpha = 0.5; //Remove if pngs have alpha
             context.drawImage(img2, 0, 0, img2.width, img2.height, 0, 0, canvas.width, canvas.height);
+
+            setBaseFile(canvas.toDataURL());
+            console.log(canvas.toDataURL());
+            console.log(`canvas saved ^^`);
         };
 
         img1.src = base64ImageString;
-        setBaseFile(canvas.toDataURL());
     }
 
     const urlToObject = async (imageURL) => {
@@ -170,11 +179,13 @@ function Update(props) {
             alert("Please fill the frame first");
         } else {
             setLoading(true);
+
             const imageUpload = await ipfsClient.add(baseFile);
             const imagePath = `https://ipfs.io/ipfs/${imageUpload.path}`;
             var dt = { image: imagePath, name: `Frame #${id}`, description, timestamp: Date.now() };
             const { path } = await ipfsClient.add(JSON.stringify(dt));
             const data = contractInstance.interface.encodeFunctionData("update", [id, `https://ipfs.io/ipfs/${path}`]);
+            console.log(`new update: https://ipfs.io/ipfs/${path}`);
             await tx(
                 userSigner.sendTransaction({
                     to: ContractAddress,
@@ -191,7 +202,7 @@ function Update(props) {
         if (newImageSet) {
             return (<canvas id="canvas"></canvas>)
         } else {
-            return <img src={baseFile} />
+            return <img src={baseFile} alt="The image hasnt loaded yet from IPFS" />
         }
     }
 
@@ -207,8 +218,12 @@ function Update(props) {
                             const urlParams = new URLSearchParams(window.location.search);
 
                             urlParams.set('id', e.target.value);
+                            if (window.location.toString().includes("?id=")) {
 
-                            window.location.search = urlParams;
+                                window.location = window.location.toString().split("?id=")[0]+"?"+urlParams;
+                            } else {
+                                window.location = window.location+"?"+urlParams;
+                            }
                         }
                         setId(e.target.value)
                     }
@@ -244,7 +259,6 @@ function Update(props) {
                                 <div style={{ display: "flex", justifyContent: "space-around" }}> <input type="file" id="fileToUse" onChange={(e) => {
                                     getBase64(document.getElementById("fileToUse").files[0]);
                                     console.log(baseFile);
-                                    console.log(getBase64(document.getElementById("fileToUse").files[0]));
                                     setNewImageSet(true);
 
                                 }} /> <div style={{ display: "flex", flexDirection: "column" }}><>OR</> <p style={{ fontSize: "xx-small", color: "limegreen" }}>(Only Image Files/URLs are allowed)</p>
@@ -292,17 +306,15 @@ function Update(props) {
                     </div>
                     <br />
                     <br />
-                    {/* <img src="./samples.gif" width="60" height="70" />
- */}
                     <br />
 
                     <br />
-                    {iterations ?
+                    {history && (iterations.length == history.length) ?
                         <>
                             <h3 style={{ color: "black" }}>👇explore the history of this frame👇</h3>
                             {iterations.map(e => <ShowIteration data={e} />)}
                         </>
-                        : <></>}
+                        : <>Each page of this frames history is loading one by one... </>}
 
                 </div>
             </div>

@@ -18,7 +18,7 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 //
 // Select the network you want to deploy to here:
 //
-const defaultNetwork = "optimism";
+const defaultNetwork = "matic";
 
 function mnemonic() {
   try {
@@ -85,8 +85,8 @@ module.exports = {
       },
     },
     matic: {
-      url: 'https://rpc-mainnet.maticvigil.com/',
-      gasPrice: 1000000000,
+      url: 'https://polygon-rpc.com/',
+      gasPrice: 100000000000,
       accounts: {
         mnemonic: mnemonic(),
       },

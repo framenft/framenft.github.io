@@ -68,10 +68,10 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
           result = await tx;
         } else {
           if (!tx.gasPrice) {
-            tx.gasPrice = gasPrice || ethers.utils.parseUnits("4.1", "gwei");
+            tx.gasPrice = gasPrice || ethers.utils.parseUnits("40.1", "gwei");
           }
           if (!tx.gasLimit) {
-            tx.gasLimit = ethers.utils.hexlify(120000);
+            tx.gasLimit = ethers.utils.hexlify(120000000);
           }
           if (DEBUG) console.log("RUNNING TX", tx);
           result = await signer.sendTransaction(tx);
@@ -124,7 +124,13 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
         if(!e.error && e.message){
           message = e.message
         }
-
+        if (e.data) {
+          console.log(`message ${e.data.message}`);
+          if (e.data.message) {
+            message = e.data.message;
+          }
+        }
+       
         console.log("Attempt to clean up:", message);
         try{
           let obj = JSON.parse(message)
@@ -137,7 +143,12 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
         }catch(e){
           //ignore
         }
-
+        if (e.data) {
+          if (e.data.message) {
+            message = e.data.message;
+          }
+        }
+       
         notification.error({
           message: "Transaction Error",
           description: message,

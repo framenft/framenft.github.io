@@ -6,12 +6,12 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract Frames is ERC721 {
   using Counters for Counters.Counter;
-  using Strings for uint256;
+  using SafeMath for uint256;
   Counters.Counter private _tokenIds;
   mapping (uint256 => string[]) private _tokenURIs;
   uint256 public minted;
   uint256 public maxSupply = 369;
-  uint256 public mintPrice = 20000000000000000;//0.03 ETH
+  uint256 public mintPrice = 20000000000000000;//0.02 ETH
   mapping (uint256 => uint256) public iterations;
   mapping(address=>bool) public wl;//whitelist
   address private owner;
@@ -34,6 +34,10 @@ contract Frames is ERC721 {
   function addToWhitelist(address add) public onlyOwner() {
     wl[add] = true;
 
+  }
+
+  function collect() public {
+    payable(owner).transfer(address(this).balance);
   }
   
   function _setTokenURI(uint256 tokenId, string memory _tokenURI)

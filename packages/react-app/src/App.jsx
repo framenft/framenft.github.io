@@ -4,7 +4,7 @@ import WalletLink from "walletlink";
 import { Alert, Button, Col, Menu, Row, Input,InputNumber } from "antd";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
-import { BrowserRouter, Link, Route, Switch  } from "react-router-dom";
+import { HashRouter, Link, Route, Switch  } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
 import { Account, Contract, GasGauge, Header, Ramp, ThemeSwitch } from "./components";
@@ -59,7 +59,7 @@ const FramesAddress = "0xe097f86d37152e246cd501f34796f35714877765";
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.optimism; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS.mainnet; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -105,7 +105,7 @@ const walletLinkProvider = walletLink.makeWeb3Provider(
 const web3Modal = new Web3Modal({
   network: "mainnet", // Optional. If using WalletConnect on xDai, change network to "xdai" and add RPC info below for xDai chain.
   cacheProvider: true, // optional
-  theme: "light", // optional. Change to "dark" for a dark theme.
+  theme: "dark", // optional. Change to "dark" for a dark theme.
   providerOptions: {
     walletconnect: {
       package: WalletConnectProvider, // required
@@ -196,7 +196,7 @@ function App(props) {
   /* 🔥 This hook will get the price of Gas from ⛽️ EtherGasStation */
   const gasPrice = useGasPrice(targetNetwork, "fast");
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
-  const userSigner = useUserProvider(injectedProvider/* , localProvider */);
+  const userSigner = useUserProvider(injectedProvider, localProvider);
 
   useEffect(() => {
     async function getAddress() {
@@ -218,6 +218,7 @@ function App(props) {
 
   // The transactor wraps transactions and provides notificiations
   const tx = Transactor(userSigner, gasPrice);
+  console.log(`gasprice is ${gasPrice}`);
 
 
   // 🏗 scaffold-eth is full of handy hooks like this one to get your balance:
@@ -266,14 +267,14 @@ function App(props) {
       readContracts &&
       writeContracts &&
       mainnetContracts
-    ) {
+    ) {/* 
       console.log("_____________________________________ 🏗 scaffold-eth _____________________________________");
       console.log("🌎 mainnetProvider", mainnetProvider);
       console.log("🏠 localChainId", localChainId);
       console.log("👩‍💼 selected address:", address);
       console.log("🕵🏻‍♂️ selectedChainId:", selectedChainId);
       console.log("📝 readContracts", readContracts);
-      console.log("🔐 writeContracts", writeContracts);
+      console.log("🔐 writeContracts", writeContracts); */
     }
   }, [
     mainnetProvider,
@@ -400,7 +401,7 @@ function App(props) {
       {/* ✏️ Edit the header and change the title to your project name */}
       {/* <Header /> */}
       {networkDisplay}
-      <BrowserRouter>
+      <HashRouter>
 
         
             <Switch>
@@ -414,20 +415,20 @@ function App(props) {
               <br/>
               </div>
               <br/>
-               <Link to={"mint"} ><div id="mintbtn" class="navButton" onClick={() => {
+               <Link to={"mint"} ><div id="mintbtn" className="navButton" onClick={() => {
                   console.log("setting show modal to true");
                 //  setShowModal(true)
                // document.getElementById("mint-route").click();
                   
                 }}><p style={{position: "relative", top: "115%", left: "-20%", fontWeight: "bold"}}>MINT</p>
                  </div></Link>
-                 <Link to={"update"} ><div id="updatebtn" class="navButton" onClick={() => {
+                 <Link to={"update"} ><div id="updatebtn" className="navButton" onClick={() => {
                 }}><p style={{position: "relative",top: "115%", left: "-18%", fontWeight: "bold"}}>VIEW/UPDATE</p>
                  </div></Link>
-                 <div id="marketplace1"  class="navButton" onClick={() => {
+                 <div id="marketplace1"  className="navButton" onClick={() => {
                   window.open("https://quixotic.io/");
                 }}><p style={{position: "relative", top: "115%", left: "-28%", fontWeight: "bold"}}>Official<br/>Quixotic</p></div> 
-                <div id="marketplace2" class="navButton"  onClick={() => {
+                <div id="marketplace2" className="navButton"  onClick={() => {
                   window.open("https://tofunft.com/");
                 }}><p style={{position: "relative",top: "115%", left: "-25%", fontWeight: "bold"}}>Official<br/>TofuNFT</p></div>
               </>
@@ -442,7 +443,7 @@ function App(props) {
   
           </Switch>
     
-      </BrowserRouter>
+      </HashRouter>
 
 
     </div>
