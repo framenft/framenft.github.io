@@ -224,7 +224,7 @@ function Mint(props) {
                     <br />
                     {provider ?
                         <p>Refer someone and earn 10% of their mint fee:<br />
-                            <a href={`https://pillz.art/?ref=${address}`}>{`https://pillz.art/?ref=${address}`}</a></p>
+                            <a href={`https://framenft.github.io/?ref=${address}`}>{`https://framenft.github.io/?ref=${address}`}</a></p>
                         : <></>}
 
                 </div>
