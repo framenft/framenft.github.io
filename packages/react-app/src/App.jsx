@@ -426,11 +426,11 @@ function App(props) {
                 }}><p style={{position: "relative",top: "115%", left: "-18%", fontWeight: "bold"}}>VIEW/UPDATE</p>
                  </div></Link>
                  <div id="marketplace1"  className="navButton" onClick={() => {
-                  window.open("https://quixotic.io/");
-                }}><p style={{position: "relative", top: "115%", left: "-28%", fontWeight: "bold"}}>Official<br/>Quixotic</p></div> 
+                  window.open("https://rarible.com/collection/0x29c85b15f051fdb4d9778b82b45c280329f5338a/items");
+                }}><p style={{position: "relative", top: "115%", left: "-28%", fontWeight: "bold"}}>Official<br/>Rarible</p></div> 
                 <div id="marketplace2" className="navButton"  onClick={() => {
-                  window.open("https://tofunft.com/");
-                }}><p style={{position: "relative",top: "115%", left: "-25%", fontWeight: "bold"}}>Official<br/>TofuNFT</p></div>
+                  window.open("https://opensea.io/collection/frame-v4-1");
+                }}><p style={{position: "relative",top: "115%", left: "-25%", fontWeight: "bold"}}>Official<br/>OpenSea</p></div>
               </>
             </Route>
             <Route path="/mint">
