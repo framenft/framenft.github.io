@@ -20,7 +20,7 @@ import { create as createIPFSClient } from 'ipfs-http-client';
 const ipfsClient = createIPFSClient('https://ipfs.infura.io:5001')
 import { Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch } from "./components";
 import FramesAbi from "./contracts/Frames.abi";
-import { getHashURLParam, getURLParam } from "./helpers";
+import { dataURItoBlob, getHashURLParam, getURLParam } from "./helpers";
 import ContractAddress from "./contracts/Frames.address";
 import { Loading3QuartersOutlined, LoadingOutlined } from "@ant-design/icons";
 
@@ -33,6 +33,7 @@ function ShowIteration(props) {
             {data ?
                 <div style={{ border: "1px solid black" }}>
                     <img src={data.image} />
+                    <h4 style={{color: "black"}}>{data.name}</h4>
                     <p><b>{new Date(data.timestamp).toString()}</b></p>
                     <p>{data.description}</p>
                 </div>
@@ -48,6 +49,7 @@ function Update(props) {
     const [loading, setLoading] = useState();
     const [id, setId] = useState();
     const [baseFile, setBaseFile] = useState("");
+    const [newTitle, setNewTitle] = useState("");
     const DESCRIPTION_PLACEHOLDER = "Interpretation is a product of perspective. The frame from which we see things shapes our experience, now it can shape the things as well. Frame explores the intersection of art and ownership to create a piece of media that is effected by its owners in a way that has never been possible before.";
     const [description, setDescription] = useState();
     const [iterations, setIterations] = useState([]);
@@ -72,6 +74,7 @@ function Update(props) {
             await getData(tokenURI, d => {
                 setBaseFile(d.image);
                 setDescription(d.description);
+                setNewTitle(d.name);
             });
         }
     }
@@ -162,6 +165,7 @@ function Update(props) {
         img1.src = base64ImageString;
     }
 
+
     const urlToObject = async (imageURL) => {
         console.log(`getting ${imageURL}`);
         const response = await fetch(imageURL);
@@ -180,9 +184,10 @@ function Update(props) {
         } else {
             setLoading(true);
 
-            const imageUpload = await ipfsClient.add(baseFile);
+            const imageUpload = await ipfsClient.add(dataURItoBlob(baseFile));
             const imagePath = `https://ipfs.io/ipfs/${imageUpload.path}`;
-            var dt = { image: imagePath, name: `Frame #${id}`, description, timestamp: Date.now() };
+            console.log(`image uploaded to ${imagePath}`);
+            var dt = { image: imagePath, name:newTitle, description, timestamp: Date.now() };
             const { path } = await ipfsClient.add(JSON.stringify(dt));
             const data = contractInstance.interface.encodeFunctionData("update", [id, `https://ipfs.io/ipfs/${path}`]);
             console.log(`new update: https://ipfs.io/ipfs/${path}`);
@@ -264,7 +269,9 @@ function Update(props) {
                                 }} /> <div style={{ display: "flex", flexDirection: "column" }}><>OR</> <p style={{ fontSize: "xx-small", color: "limegreen" }}>(Only Image Files/URLs are allowed)</p>
                                     </div> <input type="text" id="linkToUse" placeholder="URL of image" onChange={(e) => { urlToObject(e.target.value); setNewImageSet(true); }} /> </div>
                             </>
-
+                            <br/>
+                            <Input style={{width: "60%", color: "black", textAlign: "center"}} type="text" value={newTitle} onChange={(e)=> {setNewTitle(e.target.value)}}/>
+                            <br/><br/>
                             <TextArea
                                 style={{ width: "80%", textDecoration: "none", textAlign: "center", color: "black" }}
                                 placeholder={''}

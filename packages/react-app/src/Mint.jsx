@@ -20,7 +20,7 @@ import { create as createIPFSClient } from 'ipfs-http-client';
 const ipfsClient = createIPFSClient('https://ipfs.infura.io:5001')
 import { Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch } from "./components";
 import FramesAbi from "./contracts/Frames.abi";
-import { getURLParam } from "./helpers";
+import { dataURItoBlob, getURLParam } from "./helpers";
 import ContractAddress from "./contracts/Frames.address";
 
 
@@ -112,7 +112,7 @@ function Mint(props) {
             alert("Please fill the frame first");
         } else {
             setLoading(true);
-            const imageUpload = await ipfsClient.add(baseFile);
+            const imageUpload = await ipfsClient.add(dataURItoBlob(baseFile));
             const imagePath = `https://ipfs.io/ipfs/${imageUpload.path}`;
             var dt = { image: imagePath, name: `Frame #${parseInt(mintedSoFar) + 1}`, description, timestamp: Date.now() };
             const { path } = await ipfsClient.add(JSON.stringify(dt));
